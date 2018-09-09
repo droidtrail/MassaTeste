@@ -1,23 +1,21 @@
-package br.ce.wcaquino.estrategia1;
+package br.ce.wcaquino.estrategia2;
 
 import java.util.concurrent.TimeUnit;
 
-import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.FixMethodOrder;
 import org.junit.Test;
-import org.junit.runners.MethodSorters;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+import com.github.javafaker.Faker;
+
+
 public class ContaTesteWeb {
 
 	private static FirefoxDriver driver;
+	private Faker faker = new Faker();
 	
 
 	@BeforeClass
@@ -35,13 +33,12 @@ public class ContaTesteWeb {
 	}
 
 	@Test
-	public void test_1_inserir() {
+	public void inserir() {
 
 		driver.findElement(By.linkText("Contas")).click();
 		driver.findElement(By.linkText("Adicionar")).click();
-		WebElement campoNome = driver.findElement(By.id("nome"));
-		campoNome.clear();
-		campoNome.sendKeys("Conta Estratégia #1");
+		driver.findElement(By.id("nome")).clear();
+		driver.findElement(By.id("nome")).sendKeys(faker.harryPotter().character());
 		driver.findElement(By.tagName("button")).click();
 
 		String msgSucesso = driver.findElement(By.xpath("//div[@class='alert alert-success']")).getText();
@@ -49,25 +46,26 @@ public class ContaTesteWeb {
 	}
 	
 	@Test
-	public void test_2_consultar() {
-
+	public void consultar() {
+		String conta = inserirConta();
+		
 		driver.findElement(By.linkText("Contas")).click();
 		driver.findElement(By.linkText("Listar")).click();
-		driver.findElement(By.xpath("//td[.='Conta Estratégia #1']/..//a[1]")).click();
+		driver.findElement(By.xpath("//td[.='"+conta+"']/..//a[1]")).click();
 		
 		String msgAlterar = driver.findElement(By.id("nome")).getAttribute("value");
-		Assert.assertEquals("Conta Estratégia #1", msgAlterar);
+		Assert.assertEquals(conta, msgAlterar);
 	}
 	
 	@Test
-	public void test_3_alterar() {
+	public void alterar() {
 
+		String conta = inserirConta();
+		
 		driver.findElement(By.linkText("Contas")).click();
 		driver.findElement(By.linkText("Listar")).click();
-		driver.findElement(By.xpath("//td[.='Conta Estratégia #1']/..//a[1]")).click();
-		WebElement campoNome = driver.findElement(By.id("nome"));
-		campoNome.clear();
-		campoNome.sendKeys("Conta Estratégia #1 Alterada");
+		driver.findElement(By.xpath("//td[.='"+conta+"']/..//a[1]")).click();
+		driver.findElement(By.id("nome")).sendKeys(" Alterado");
 		driver.findElement(By.tagName("button")).click();
 		
 		String msgSucesso = driver.findElement(By.xpath("//div[@class='alert alert-success']")).getText();
@@ -75,14 +73,27 @@ public class ContaTesteWeb {
 	}
 	
 	@Test
-	public void test_4_deletar() {
+	public void deletar() {
+		String conta = inserirConta();
 
 		driver.findElement(By.linkText("Contas")).click();
 		driver.findElement(By.linkText("Listar")).click();
-		driver.findElement(By.xpath("//td[.='Conta Estratégia #1 Alterada']/..//a[2]")).click();
+		driver.findElement(By.xpath("//td[.='"+conta+"']/..//a[2]")).click();
 		
 		String msgAlterar = driver.findElement(By.xpath("//div[@class='alert alert-success']")).getText();
 		Assert.assertEquals("Conta removida com sucesso!", msgAlterar);
+	}
+	
+	private String inserirConta() {
+		
+		String registro = faker.harryPotter().character();
+		driver.findElement(By.linkText("Contas")).click();
+		driver.findElement(By.linkText("Adicionar")).click();
+		driver.findElement(By.id("nome")).clear();
+		driver.findElement(By.id("nome")).sendKeys(registro);
+		driver.findElement(By.tagName("button")).click();
+		
+		return registro;
 	}
 
 	@AfterClass

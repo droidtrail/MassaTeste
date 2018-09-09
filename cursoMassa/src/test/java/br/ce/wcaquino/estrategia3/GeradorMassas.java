@@ -3,7 +3,6 @@ package br.ce.wcaquino.estrategia3;
 import java.sql.SQLException;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.BeforeClass;
 import org.openqa.selenium.By;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
@@ -14,7 +13,7 @@ public class GeradorMassas {
 	private static FirefoxDriver driver;
 	public static final String CHAVE_CONTA_SB = "CONTA_SB";
 
-//	@BeforeClass
+	
 	public void gerarContaSeuBarriga() throws ClassNotFoundException, SQLException {
 
 		System.setProperty("webdriver.gecko.driver", "e:\\GeckoDriver\\geckodriver.exe");
@@ -42,13 +41,13 @@ public class GeradorMassas {
 	}
 
 	public static void main(String[] args) throws ClassNotFoundException, SQLException {
-//		GeradorMassas gerador = new GeradorMassas();
-//
-//		for (int i = 0; i < 5; i++) {
-//			gerador.gerarContaSeuBarriga();
-//		}
-		String massa = new MassaDAOImpl().obterMassa(CHAVE_CONTA_SB);
-		System.out.println(massa);
+		GeradorMassas gerador = new GeradorMassas();
+
+		for (int i = 0; i < 5; i++) {
+			gerador.gerarContaSeuBarriga();
+		}
+//		String massa = new MassaDAOImpl().obterMassa(CHAVE_CONTA_SB);
+//		System.out.println(massa);
 	}
 	
 

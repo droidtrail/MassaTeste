@@ -13,7 +13,7 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import com.github.javafaker.Faker;
 
 
-public class ContaTesteWeb {
+public class ContaTesteWeb3 {
 
 	private static FirefoxDriver driver;
 	private Faker faker = new Faker();

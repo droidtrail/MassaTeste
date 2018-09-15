@@ -12,7 +12,7 @@ import br.ce.wcaquino.entidades.Usuario;
 import br.ce.wcaquino.service.ContaService;
 import br.ce.wcaquino.service.UsuarioService;
 
-public class ContasServiceTeste {
+public class ContasServiceTeste2 {
 
 	static Faker faker = new Faker();
 	ContaService service = new ContaService();

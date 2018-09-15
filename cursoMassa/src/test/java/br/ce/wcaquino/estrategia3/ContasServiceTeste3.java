@@ -13,21 +13,12 @@ import br.ce.wcaquino.entidades.Usuario;
 import br.ce.wcaquino.service.ContaService;
 import br.ce.wcaquino.service.UsuarioService;
 
-public class ContasServiceTeste {
+public class ContasServiceTeste3 {
 
 	static Faker faker = new Faker();
 	ContaService service = new ContaService();
 	UsuarioService userService = new UsuarioService();
-	private static Usuario usuarioGlobal;
-
-	@BeforeClass
-	public static void criarUsuario() {
-
-		usuarioGlobal = new Usuario(faker.name().fullName(), faker.internet().emailAddress(),
-				faker.internet().password());
-
-	}
-
+	
 	@Test
 	public void testeInserir() throws Exception {
 
@@ -43,7 +34,7 @@ public class ContasServiceTeste {
 	@Test
 	public void testAlterar() throws ClassNotFoundException, SQLException, Exception {
 		Conta contaTeste = service.findByName(new MassaDAOImpl().obterMassa(GeradorMassas.CHAVE_CONTA));
-		String novoNome = faker.ancient().god();
+		String novoNome = faker.ancient().god() + " " +faker.ancient().titan();
 		contaTeste.setNome(novoNome);
 		Conta contaAlterada = service.salvar(contaTeste);
 		Assert.assertEquals(novoNome, contaAlterada.getNome());

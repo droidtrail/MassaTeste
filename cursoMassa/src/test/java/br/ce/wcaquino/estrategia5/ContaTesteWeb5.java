@@ -13,6 +13,7 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 
 public class ContaTesteWeb5 {
 
+	//O static aproveita a mesma janela
 	private static FirefoxDriver driver;
 
 	@BeforeClass
@@ -26,19 +27,20 @@ public class ContaTesteWeb5 {
 		driver.findElement(By.id("senha")).sendKeys("123");
 		driver.findElement(By.xpath("//button[.='Entrar']")).click();
 		driver.findElement(By.linkText("reset")).click();
-		//driver.quit();
+		//driver.quit(); Não precisa fechar. Trabalharemos na mesma janela.
 	}
 
-	@Before
-	public void login() {
-		driver = new FirefoxDriver();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-		driver.get("https://seubarriga.wcaquino.me");
-		driver.manage().window().maximize();
-		driver.findElement(By.id("email")).sendKeys("cursoselenium@gmail.com");
-		driver.findElement(By.id("senha")).sendKeys("123");
-		driver.findElement(By.xpath("//button[.='Entrar']")).click();
-	}
+	//Não precisa do @Before pois usaremos o navegador do @BeforeClass
+//	@Before
+//	public void login() {
+//		driver = new FirefoxDriver();
+//		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+//		driver.get("https://seubarriga.wcaquino.me");
+//		driver.manage().window().maximize();
+//		driver.findElement(By.id("email")).sendKeys("cursoselenium@gmail.com");
+//		driver.findElement(By.id("senha")).sendKeys("123");
+//		driver.findElement(By.xpath("//button[.='Entrar']")).click();
+//	}
 
 	@Test
 	public void inserir() throws ClassNotFoundException, SQLException {
@@ -92,7 +94,7 @@ public class ContaTesteWeb5 {
 //		return registro;
 //	}
 
-	@AfterClass
+	@AfterClass/*A seção será fechada apenas quando todos os testes terminarem*/
 	public static void fechar() {
 		driver.quit();
 	}

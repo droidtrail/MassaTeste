@@ -1,5 +1,15 @@
 package br.ce.wcaquino.estrategia4;
 
+import static br.ce.wcaquino.dao.utils.ConnectionFactory.getConnection;
+
+import java.io.File;
+import java.io.FileInputStream;
+
+import org.dbunit.Assertion;
+import org.dbunit.database.DatabaseConnection;
+import org.dbunit.dataset.IDataSet;
+import org.dbunit.dataset.xml.FlatXmlDataSet;
+import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -23,6 +33,23 @@ public class ContasServiceTeste_4DbUnit {
 		Conta ContaSalva = service.salvar(conta);
 		Assert.assertNotNull(ContaSalva.getId());
 
+	}
+
+	@Test
+	public void testeInserir_Assertion() throws Exception {
+
+		ImportExport.importarBanco("est4_inserirConta.xml");
+
+		// Estado Atual do BD
+		DatabaseConnection dbConn = new DatabaseConnection(getConnection());
+		IDataSet estadoAtualBanco = dbConn.createDataSet();
+
+		// Estado Esperado (XML)
+		FlatXmlDataSetBuilder builder = new FlatXmlDataSetBuilder();
+		FlatXmlDataSet dataSetEsperado = builder.build(new FileInputStream("massas" + File.separator + "est4_inserirContaSaida.xml"));
+
+		// Comparar os 2 estados
+		 Assertion.assertEquals(dataSetEsperado,estadoAtualBanco);
 	}
 
 	@Test

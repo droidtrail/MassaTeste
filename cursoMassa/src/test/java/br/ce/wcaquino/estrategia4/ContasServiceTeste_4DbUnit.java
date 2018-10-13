@@ -4,10 +4,15 @@ import static br.ce.wcaquino.dao.utils.ConnectionFactory.getConnection;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.List;
 
 import org.dbunit.Assertion;
+import org.dbunit.assertion.DiffCollectingFailureHandler;
+import org.dbunit.assertion.Difference;
 import org.dbunit.database.DatabaseConnection;
 import org.dbunit.dataset.IDataSet;
+import org.dbunit.dataset.ITable;
+import org.dbunit.dataset.filter.DefaultColumnFilter;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
 import org.junit.Assert;
@@ -30,15 +35,16 @@ public class ContasServiceTeste_4DbUnit {
 		ImportExport.importarBanco("est4_inserirConta.xml");
 		Usuario usuario = userService.findById(1L);
 		Conta conta = new Conta("Conta salva", usuario);
-		Conta ContaSalva = service.salvar(conta);
-		Assert.assertNotNull(ContaSalva.getId());
-
+		Conta contaSalva = service.salvar(conta);
 	}
-
+	
 	@Test
-	public void testeInserir_Assertion() throws Exception {
-
+	public void testeInserir_Filter() throws Exception {
+		
 		ImportExport.importarBanco("est4_inserirConta.xml");
+		Usuario usuario = userService.findById(1L);
+		/*Conta conta = new Conta("Conta salva", usuario);
+		service.salvar(conta);*/
 
 		// Estado Atual do BD
 		DatabaseConnection dbConn = new DatabaseConnection(getConnection());
@@ -49,7 +55,69 @@ public class ContasServiceTeste_4DbUnit {
 		FlatXmlDataSet dataSetEsperado = builder.build(new FileInputStream("massas" + File.separator + "est4_inserirContaSaida.xml"));
 
 		// Comparar os 2 estados
-		 Assertion.assertEquals(dataSetEsperado,estadoAtualBanco);
+		ITable contaAtualFiltrada = DefaultColumnFilter.excludedColumnsTable(estadoAtualBanco.getTable("contas"), new String [] {"id"});
+		ITable contaEsperadaFiltradas = DefaultColumnFilter.excludedColumnsTable(dataSetEsperado.getTable("contas"), new String [] {"id"});
+		
+		ITable usuarioAtualFiltrada = DefaultColumnFilter.excludedColumnsTable(estadoAtualBanco.getTable("usuarios"), new String [] {"created_at"});
+		ITable usuarioEsperadaFiltradas = DefaultColumnFilter.excludedColumnsTable(dataSetEsperado.getTable("usuarios"), new String [] {"created_at"});
+
+		 //Assertion.assertEquals(contaEsperadaFiltradas, contaAtualFiltrada);
+		 Assertion.assertEquals(usuarioEsperadaFiltradas, usuarioAtualFiltrada);
+
+	}
+
+
+	@Test
+	public void testeInserir_Assertion() throws Exception {
+		
+		ImportExport.importarBanco("est4_inserirConta.xml");
+		Usuario usuario = userService.findById(1L);
+		Conta conta = new Conta("Conta salva", usuario);
+		Conta contaSalva = service.salvar(conta);
+
+		// Estado Atual do BD
+		DatabaseConnection dbConn = new DatabaseConnection(getConnection());
+		IDataSet estadoAtualBanco = dbConn.createDataSet();
+
+		// Estado Esperado (XML)
+		FlatXmlDataSetBuilder builder = new FlatXmlDataSetBuilder();
+		FlatXmlDataSet dataSetEsperado = builder.build(new FileInputStream("massas" + File.separator + "est4_inserirContaSaida.xml"));
+
+		// Comparar os 2 estados
+		 //Assertion.assertEquals(dataSetEsperado,estadoAtualBanco);
+		
+		DiffCollectingFailureHandler handler = new DiffCollectingFailureHandler();
+		Assertion.assertEquals(dataSetEsperado,estadoAtualBanco, handler);
+		List <Difference> erros = handler.getDiffList();
+		
+		boolean erroReal = false;
+		for(Difference erro: erros) {
+			System.out.println(erro.toString());
+			if(erro.getActualTable().getTableMetaData().getTableName().equals("contas")) {
+				if(erro.getColumnName().equals("id")) {
+					
+					if(erro.getActualValue().toString().equals(contaSalva.getId().toString())){
+						
+						continue;
+						
+					} else {	
+						
+						System.out.println("Id errado mesmo!");	
+						erroReal = true;
+						
+					}
+				} else {
+					
+					erroReal = true;
+				}
+				
+			} else {
+				
+				erroReal = true;
+			}
+		}
+		Assert.assertFalse(erroReal);
+		
 	}
 
 	@Test
